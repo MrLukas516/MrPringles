@@ -1,0 +1,159 @@
+<html>
+	<head>
+		<title>Mr. Pringles - Level Editor</title>
+		<!-- all js files -->
+		<script src="js/render.js" type="text/javascript"> </script>
+		<script src="js/menu.js" type="text/javascript"> </script>
+		<script src="js/grid.js" type="text/javascript"> </script>
+		
+		<!-- init.js -->
+		<script type="text/javascript">
+			var grid,gh,gw,gl;
+		
+			window.addEventListener("load",init,false);
+
+			function init(){
+				renderInit();
+				adjustGrid();
+				
+				document.getElementById("lvlw").addEventListener("change",adjustGrid,false);
+				document.getElementById("lvlh").addEventListener("change",adjustGrid,false);
+				document.getElementById("lvlg").addEventListener("change",adjustGrid,false);
+				
+				window.addEventListener("mousemove", mouseMove, false);
+				window.addEventListener("click", mouseClick, false);
+				window.addEventListener("keydown", keyPress, false);
+				
+				window.requestAnimationFrame(edraw);
+			}
+
+			function adjustGrid(){
+				var gwo = gw;
+				var gho = gh;
+			
+				gw = document.getElementById("lvlw").value*1;
+				gh = document.getElementById("lvlh").value*1;
+				
+				gl = document.getElementById("lvlg").value*1;
+				document.getElementById("lvlg").max = gh-1;
+				if(gl>gh)document.getElementById("lvlg").value = gh-1;
+								
+				gl = document.getElementById("lvlg").value*1;
+								
+				if(grid==null){
+					grid = new Array(gw);
+					for(x=0;x<gw;x++){grid[x]=new Array(gh);}
+					
+					for(var x=0;x<gw;x++){
+						for(var y=0;y<gh;y++){
+							grid[x][y] = {
+								type:"air",
+								objectData:null,
+								pos:{x:0,y:0}
+							};
+							grid[x][y].pos.x = x;
+							grid[x][y].pos.y = y-gl;
+						}
+					}
+				}else{
+					var newgrid = new Array(gw);
+					for(x=0;x<gw;x++){newgrid[x]=new Array(gh);}
+					
+					for(x=0;x<gw;x++){
+						for(y=0;y<gh;y++){
+							var air = {
+								type:"air",
+								objectData:null,
+								pos:{x:0,y:0}
+							};
+							newgrid[x][y] = x<gwo && y<gho ? grid[x][y] : air;
+							newgrid[x][y].pos.x = x;
+							newgrid[x][y].pos.y = y-gl;
+						}
+					}
+					
+					grid = newgrid;
+				}
+			}
+			
+			var mouse = {x:0,y:0,gx:0,gy:0};
+			function mouseMove(e){
+				mouse.x = e.pageX-cOffX;
+				mouse.y = e.pageY-cOffY;
+				
+				mouse.gx = Math.floor((mouse.x-shift.x)/cu);
+				mouse.gy = Math.floor((mouse.y - (ch - ch*groundPer) - shift.y)/cu);
+				
+				mouse.gx = Math.max(Math.min(mouse.gx,gw-1),0);
+				mouse.gy = Math.max(Math.min(mouse.gy,gh-gl-1),-gl);
+				
+				document.getElementById("mouseinfo").innerHTML = "x:"+mouse.x+",y:"+mouse.y+"|gx:"+mouse.gx+",gy"+mouse.gy;
+			}
+			
+			function mouseClick(){
+				
+			}
+			
+			function keyPress(e){
+				var s = cu/2;
+				if(e.keyCode==38)shift.y-=s;
+				if(e.keyCode==40)shift.y+=s;
+				if(e.keyCode==37)shift.x-=s;
+				if(e.keyCode==39)shift.x+=s;
+			}
+			
+			var shift = {x:0,y:22.5};
+			
+			function edraw(){
+				ctx.clearRect(0,0,cw,ch);
+	
+				ctx.strokeStyle="orange";
+					
+				for(x=0;x<gw;x++){
+					for(y=0;y<gh;y++){
+						var g = grid[x][y];
+						
+						//textur anhand type
+						
+						ctx.fillStyle=g.type=="grass" ? "green" : "black";
+
+						ctx.fillRect(g.pos.x*cu+shift.x,ch - ch*groundPer+g.pos.y*cu+shift.y,cu,cu);
+						
+						if(g.pos.x==mouse.gx && g.pos.y==mouse.gy){
+							ctx.fillStyle="rgba(255,255,255,0.3)";
+							ctx.fillRect(g.pos.x*cu+shift.x,ch - ch*groundPer+g.pos.y*cu+shift.y,cu,cu);
+						}
+					}
+				}
+				
+				ctx.beginPath();
+				ctx.moveTo(0,ch - ch*groundPer + shift.y);
+				ctx.lineTo(cw,ch - ch*groundPer + shift.y);
+				ctx.stroke();
+				
+				window.requestAnimationFrame(edraw);
+			}
+		</script>
+		
+		<link rel='stylesheet' type='text/css' href='style.css' />
+	</head>
+	<body>
+		<canvas id='canvas'></canvas>
+		<div id="toolbar">
+			<p>
+				<span id="mouseinfo"></span>
+			</p>
+		
+			Level-Höhe:<br/>
+			<input id="lvlh" type="number" min="16" max="256" value="64"/>
+			<br/>
+			
+			Level-Breite:<br/>
+			<input id="lvlw" type="number" min="32" value="32"/>
+			<br/>
+			
+			Bodenhöhe:<br/>
+			<input id="lvlg" type="number" min="0" max="64" value="32"/>
+		</div>
+	</body>
+</html>

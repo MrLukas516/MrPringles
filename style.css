@@ -6,4 +6,16 @@ body, #canvas{
 	height:100%;
 	margin:0;
 	padding:0;
+	overflow:hidden;
+}
+
+#toolbar{
+	position:absolute;
+	top:0;
+	left:0;
+	width:20%;
+	height:100%;
+	margin:0;
+	padding:0;
+	border:1px solid gray;
 }
