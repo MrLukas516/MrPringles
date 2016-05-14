@@ -1,0 +1,52 @@
+Spieler
+	-Bewegen
+	-Springen
+	=> Kollision
+
+Umgebung
+	- Blˆcke
+	- Plattformen
+	- Items
+
+Gegner
+	- schrott KI des Todes
+
+Menu
+	- Level laden ( Json import)
+	
+Level-Editor
+	- json export
+	
+	
+=== Konzept ===
+
+Spr¸che
+	- Mr Pringles macht mobil
+	- Da kommt die Chipsdose auf die Kluft
+	- 
+
+Mentalit‰t
+	- Pr‰sentation der Werte (St‰rke Ehre Mut Kraft)
+	- Du hast Muskeln, du brauchst nicht mehr labern
+	- Nehm die Gewalt an
+	- St‰rke demonstrieren (Aussehn, Body, St‰rke, Tapferkeit, Robustheit)
+	- Steroide machen ihn klein.
+	- Beine trainieren ist Quatsch
+	- Eiweiﬂshakes
+	- go hard or go home
+
+Story
+	- Mr Pringles war 10 Jahre pumpen
+	- in McFit
+	- Mutter = Stier, Vater = B‰r
+	
+Gegner
+	- Funny Frisch Konsumenten
+	- Chio Chips Komsumenten
+	
+Steigerung : 45 > 50 > 65 > 85
+
+Inhaltstoffe:
+	- Pringles: Kalorien, Eiweiﬂ
+	- Funny Frisch: Salat
+	- Chio: Steroide

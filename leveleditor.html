@@ -22,7 +22,11 @@
 				
 				window.addEventListener("mousemove", mouseMove, false);
 				window.addEventListener("click", mouseClick, false);
+				window.addEventListener("mousedown", mouseDown, false);
+				window.addEventListener("mouseup", mouseUp, false);
 				window.addEventListener("keydown", keyPress, false);
+				
+				document.getElementById('file').addEventListener('change', handleFileSelect, false);
 				
 				window.requestAnimationFrame(edraw);
 			}
@@ -48,7 +52,6 @@
 						for(var y=0;y<gh;y++){
 							grid[x][y] = {
 								type:"air",
-								objectData:null,
 								pos:{x:0,y:0}
 							};
 							grid[x][y].pos.x = x;
@@ -63,7 +66,6 @@
 						for(y=0;y<gh;y++){
 							var air = {
 								type:"air",
-								objectData:null,
 								pos:{x:0,y:0}
 							};
 							newgrid[x][y] = x<gwo && y<gho ? grid[x][y] : air;
@@ -76,7 +78,60 @@
 				}
 			}
 			
-			var mouse = {x:0,y:0,gx:0,gy:0};
+			function exportLevel(){
+				var levelData = {
+					grid : grid,
+					gh: gh,
+					gw: gw,
+					gl: gl,
+					nr: document.getElementById("lvlnr").value*1
+				};
+				
+				var uriData = 'data:text/plain;charset=UTF-8,' + encodeURIComponent(JSON.stringify(levelData));
+				downloadFile('level'+levelData.nr+'.txt', uriData);
+			}
+			
+			function downloadFile(fileName, urlData) {
+				var aLink = document.createElement('a');
+				var evt = document.createEvent("HTMLEvents");
+				evt.initEvent("click");
+				aLink.download = fileName;
+				aLink.href = urlData;
+				aLink.dispatchEvent(evt);
+			}
+			
+			function handleFileSelect(evt) {
+				var f = evt.target.files[0]; 
+
+				if (f) {
+				  var r = new FileReader();
+				  r.onload = function(e) { 
+					var contents = e.target.result;
+					console.log( "Got the file " 
+						  +"name: " + f.name + " "
+						  +"type: " + f.type + " "
+						  +"size: " + f.size + " bytes"
+					);  
+					
+					var levelData = JSON.parse(contents);
+					
+					console.log(levelData);
+					
+					grid = levelData.grid;
+					gw = levelData.gw;
+					gh = levelData.gh;
+					gl = levelData.gl;
+					document.getElementById("lvlnr").value = levelData.nr;
+					
+					adjustGrid();
+				  }
+				  r.readAsText(f);
+				} else { 
+				  alert("Failed to load file");
+				}
+			}
+			
+			var mouse = {x:0,y:0,gx:0,gy:0,dragstart:{x:0,y:0},down:false};
 			function mouseMove(e){
 				mouse.x = e.pageX-cOffX;
 				mouse.y = e.pageY-cOffY;
@@ -85,13 +140,37 @@
 				mouse.gy = Math.floor((mouse.y - (ch - ch*groundPer) - shift.y)/cu);
 				
 				mouse.gx = Math.max(Math.min(mouse.gx,gw-1),0);
-				mouse.gy = Math.max(Math.min(mouse.gy,gh-gl-1),-gl);
+				mouse.gy = Math.max(Math.min(mouse.gy+gl,gh-1),0);
 				
-				document.getElementById("mouseinfo").innerHTML = "x:"+mouse.x+",y:"+mouse.y+"|gx:"+mouse.gx+",gy"+mouse.gy;
+				document.getElementById("mouseinfo").innerHTML = "x:"+mouse.x+",y:"+mouse.y+"|gx:"+mouse.gx+",gy:"+mouse.gy;
+				
+				if(mouse.down){
+					shift.x = shift.dragstart.x + mouse.x-mouse.dragstart.x;
+					shift.y = shift.dragstart.y + mouse.y-mouse.dragstart.y;
+				}
 			}
 			
 			function mouseClick(){
+				//grid[mouse.gx][mouse.gy].type="grass";
+			}
+			
+			function mouseUp(){
+				mouse.down=false;
 				
+				var dx =  mouse.x-mouse.dragstart.x;
+				var dy =  mouse.y-mouse.dragstart.y;
+				if(dx*dx + dy*dy < 25 && mouse.x>0 && mouse.x<cw && mouse.y>0 && mouse.y<ch){
+					grid[mouse.gx][mouse.gy].type="grass";
+				}
+			}
+			
+			function mouseDown(e){
+				mouse.down=true;
+				mouse.dragstart.x = e.pageX-cOffX;
+				mouse.dragstart.y = e.pageY-cOffY;
+				
+				shift.dragstart.x = shift.x;
+				shift.dragstart.y = shift.y;
 			}
 			
 			function keyPress(e){
@@ -102,7 +181,7 @@
 				if(e.keyCode==39)shift.x+=s;
 			}
 			
-			var shift = {x:0,y:22.5};
+			var shift = {x:0,y:22.5, dragstart:{x:0,y:0}};
 			
 			function edraw(){
 				ctx.clearRect(0,0,cw,ch);
@@ -119,7 +198,7 @@
 
 						ctx.fillRect(g.pos.x*cu+shift.x,ch - ch*groundPer+g.pos.y*cu+shift.y,cu,cu);
 						
-						if(g.pos.x==mouse.gx && g.pos.y==mouse.gy){
+						if(g.pos.x==mouse.gx && g.pos.y==mouse.gy-gl){
 							ctx.fillStyle="rgba(255,255,255,0.3)";
 							ctx.fillRect(g.pos.x*cu+shift.x,ch - ch*groundPer+g.pos.y*cu+shift.y,cu,cu);
 						}
@@ -154,6 +233,12 @@
 			
 			Bodenhöhe:<br/>
 			<input id="lvlg" type="number" min="0" max="64" value="32"/>
+			
+			<p>
+				Level-Nummer: <input id="lvlnr" type="number" min="0" value="0"/><br/>
+				Export: <button  onclick="exportLevel()">Level exportieren</button><br/>
+				Import: <input type="file" id="file"/>
+			</p>
 		</div>
 	</body>
 </html>
