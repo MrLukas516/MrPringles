@@ -45,6 +45,7 @@ function startDrawLoop(){
 //render Options
 
 var groundPer = 0.1; //Bodenhöhe
+var player = {x:0,y:31*cu};	//temporär, später woanders
 
 function draw(){
 	ctx.clearRect(0,0,cw,ch);
@@ -55,10 +56,16 @@ function draw(){
 			
 			//textur anhand type
 			
-			ctx.fillStyle="black";
-			ctx.fillRect(g.pos.x*cu,ch*groundPer+g.pos.y*cu,cu,cu);
+			ctx.fillStyle=g.type=="grass" ? "green" : "black";
+			ctx.fillRect(g.pos.x*cu-player.x,ch-ch*groundPer+g.pos.y*cu,cu,cu);
 		}
 	}
+	
+	ctx.fillStyle="orange";
+	ctx.fillRect(0,ch-ch*groundPer - cu,cu,cu);
+	
+	if(keys[keyConfig.right]==true){player.x+=1;}
+	if(keys[keyConfig.left]==true){player.x-=1;}
 	
 	window.requestAnimationFrame(draw);
 }
