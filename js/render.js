@@ -27,7 +27,7 @@ function resizeCanvas(){
 		cOffY = (document.body.clientHeight - ch)/2;
 	}
 	
-	cu = ch/20;
+	cu = Math.round(ch/20);
 	
 	canvas.style.width = cw + "px";
 	canvas.style.height = ch + "px";
@@ -56,12 +56,13 @@ function draw(){
 			//textur anhand type
 			
 			ctx.fillStyle=g.type=="grass" ? "green" : "black";
-			ctx.fillRect(g.pos.x*cu-player.x,ch-ch*groundPer+g.pos.y*cu -player.y,cu,cu);
+			//ctx.fillRect(g.pos.x*cu-player.x,ch-ch*groundPer+g.pos.y*cu -player.y,cu,cu);
+			ctx.fillRect(cw/2+x*cu-player.x, ch/2+y*cu -player.y,cu,cu);
 		}
 	}
 	
 	ctx.fillStyle="orange";
-	ctx.fillRect(0,ch-ch*groundPer - cu,cu,cu);
+	ctx.fillRect(cw/2,ch/2,cu,cu);
 	
 	updatePlayerPos();
 		

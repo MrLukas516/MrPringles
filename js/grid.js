@@ -5,7 +5,6 @@ function gridInit(){
 	
 	gw = level.gw;
 	gh = level.gh;
-	gl = level.gl;
 	
 	grid = level.grid;
 }
