@@ -52,11 +52,8 @@
 					for(var x=0;x<gw;x++){
 						for(var y=0;y<gh;y++){
 							grid[x][y] = {
-								type:"air",
-								pos:{x:0,y:0}
+								type:"air"
 							};
-							grid[x][y].pos.x = x;
-							grid[x][y].pos.y = y-gl;
 						}
 					}
 				}else{
@@ -66,12 +63,9 @@
 					for(x=0;x<gw;x++){
 						for(y=0;y<gh;y++){
 							var air = {
-								type:"air",
-								pos:{x:0,y:0}
+								type:"air"
 							};
 							newgrid[x][y] = x<gwo && y<gho ? grid[x][y] : air;
-							newgrid[x][y].pos.x = x;
-							newgrid[x][y].pos.y = y-gl;
 						}
 					}
 					
@@ -84,7 +78,6 @@
 					grid : grid,
 					gh: gh,
 					gw: gw,
-					gl: gl,
 					nr: document.getElementById("lvlnr").value*1
 				};
 				
@@ -121,7 +114,6 @@
 					grid = levelData.grid;
 					gw = levelData.gw;
 					gh = levelData.gh;
-					gl = levelData.gl;
 					document.getElementById("lvlnr").value = levelData.nr;
 					
 					adjustGrid();
@@ -137,11 +129,11 @@
 				mouse.x = e.pageX-cOffX;
 				mouse.y = e.pageY-cOffY;
 				
-				mouse.gx = Math.floor((mouse.x-shift.x)/cu);
-				mouse.gy = Math.floor((mouse.y - (ch - ch*groundPer) - shift.y)/cu);
+				mouse.gx = Math.floor((mouse.x - shift.x - cw/2)/cu);
+				mouse.gy = Math.floor((mouse.y - shift.y - ch/2)/cu);
 				
 				mouse.gx = Math.max(Math.min(mouse.gx,gw-1),0);
-				mouse.gy = Math.max(Math.min(mouse.gy+gl,gh-1),0);
+				mouse.gy = Math.max(Math.min(mouse.gy,gh-1),0);
 				
 				document.getElementById("mouseinfo").innerHTML = "x:"+mouse.x+",y:"+mouse.y+"|gx:"+mouse.gx+",gy:"+mouse.gy;
 				
@@ -197,19 +189,12 @@
 						
 						ctx.fillStyle=g.type=="grass" ? "green" : "black";
 
-						ctx.fillRect(g.pos.x*cu+shift.x,ch - ch*groundPer+g.pos.y*cu+shift.y,cu,cu);
-						
-						if(g.pos.x==mouse.gx && g.pos.y==mouse.gy-gl){
-							ctx.fillStyle="rgba(255,255,255,0.3)";
-							ctx.fillRect(g.pos.x*cu+shift.x,ch - ch*groundPer+g.pos.y*cu+shift.y,cu,cu);
-						}
+						ctx.fillRect(cw/2+x*cu+shift.x, ch/2+y*cu+shift.y,cu,cu);
 					}
 				}
 				
-				ctx.beginPath();
-				ctx.moveTo(0,ch - ch*groundPer + shift.y);
-				ctx.lineTo(cw,ch - ch*groundPer + shift.y);
-				ctx.stroke();
+				ctx.fillStyle="rgba(255,255,255,0.3)";
+				ctx.fillRect(cw/2+mouse.gx*cu+shift.x, ch/2+mouse.gy*cu+shift.y,cu,cu);
 				
 				window.requestAnimationFrame(edraw);
 			}
